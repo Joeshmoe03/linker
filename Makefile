@@ -7,4 +7,4 @@ self-linker: self-linker.c
 
 .PHONY: clean
 clean:
-	rm -f *.o $(PROGS)
+	rm -f *.o

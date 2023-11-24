@@ -67,9 +67,9 @@ Find the GDB manual and other documentation resources online at:
 For help, type "help".
 Type "apropos word" to search for commands related to "word"...
 Reading symbols from self-linker...
-(gdb) b 21
+(gdb) break 42
 Breakpoint 1 at 0x401190: file self-linker.c, line 21.
-(gdb) r
+(gdb) run
 Starting program: /home/hsolano/cs315/assignment4/self-linker 
 
 This GDB supports auto-downloading debuginfo from the following URLs:
