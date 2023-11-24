@@ -1,27 +1,35 @@
-/* self-linker.c */
 #include <stdio.h>
 #include <dlfcn.h>
 #include <stdlib.h>
 #include <gnu/lib-names.h>
 
+extern void *_GLOBAL_OFFSET_TABLE_;
+
 int main(int argc, char *argv[]) {
-	//extern void *_GLOBAL_OFFSET_TABLE_;
+
+	/* This is where the GOT table starts, our handle, and lib + our future got_entry (for now a placeholder
+	* and our symbol to resolve */
+	void** GOTtable = (void**)&_GLOBAL_OFFSET_TABLE_;
 	void *handle;
-	void *putslibcaddr;
-	void *putsgotplt;
+	char* lib = LIBC_SO;
+	char* sym = "puts";
+	void* GOTentry;
 
-	/* Code modifying GOT table for puts, before it's actually caled */
-	handle = dlopen(LIBC_SO, RTLD_LAZY);
-	putslibcaddr = dlsym(handle, "puts");
+	/* If dlopen fails, exit with error, else continue */
+	handle = dlopen(lib, RTLD_LAZY);
+	if(!handle) {
+		perror("dlopen");
+		exit(1);
+	}
 
-	/* Hardcode/magic number explanation: blah blah blah  
-	 # 404000 <puts@GLIBC_2.2.5> running objdump -j .plt -d self-linker, 
-	 same as # 0x404000 <puts@got.plt> from gdb using breakpoints and disassembling */
-	putsgotplt = (void *)0x404000;
-	//void *toChange = (void*)((__intptr_t)(_GLOBAL_OFFSET_TABLE_) + 0x1f8); //yep got us to the right place, whatever is saved at 
-	*(void **)putsgotplt = putslibcaddr;
+	/* We pass our handle to dlsym to resolve symbol of puts as an address */
+	GOTentry = dlsym(handle, sym);
+	if(GOTentry == NULL) {
+		perror("dlsym");
+		exit(1);
+	}
 
-	/* puts call */
-	puts("helloworld");
+	puts("Hello world!");
+	puts("Second message!");
+	return 0;
 }
-
