@@ -36,10 +36,10 @@ int main(int argc, char *argv[]) {
 	 same as # 0x404000 <puts@got.plt> from gdb using breakpoints and disassembling 
 	 This is the same result of as doing symgotpltaddr = (void *)0x404000;
 	 */
-
 	symgotpltval = 0x404000;
 	symgotpltaddr = (void*)((__intptr_t)(GOTtable) + (symgotpltval - (__intptr_t)(GOTtable)));
 	*(void **)symgotpltaddr = symaddress;
 	puts("Hello world!");
+	puts("Second message");
 	return 0;
 }
