@@ -40,6 +40,5 @@ int main(int argc, char *argv[]) {
 	symgotpltaddr = (void*)((__intptr_t)(GOTtable) + (symgotpltval - (__intptr_t)(GOTtable)));
 	*(void **)symgotpltaddr = symaddress;
 	puts("Hello world!");
-	puts("Second message");
 	return 0;
 }
