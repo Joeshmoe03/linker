@@ -14,9 +14,7 @@ int main(int argc, char *argv[]) {
 	char* lib = LIBC_SO;
 	char* sym = "puts";
 	void* symaddress;
-	int symgotpltval;
-	void *symgotpltaddr;
-
+	
 	/* If dlopen fails, exit with error, else continue */
 	handle = dlopen(lib, RTLD_LAZY);
 	if(!handle) {
@@ -31,15 +29,15 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	/* Hardcode/magic number explanation: We obtained the PLT entry for puts using the following commands: 
-	 # 404000 <puts@GLIBC_2.2.5> running objdump -j .plt -d self-linker, 
-	 same as # 0x404000 <puts@got.plt> from gdb using breakpoints and disassembling 
-	 This is the same result of as doing symgotpltaddr = (void *)0x404000;
-	 */
-	symgotpltval = 0x404000;
-	symgotpltaddr = (void*)((__intptr_t)(GOTtable) + (symgotpltval - (__intptr_t)(GOTtable)));
-	*(void **)symgotpltaddr = symaddress;
+	/* Hardcode explanation: Running gdb self-linker, if do "print (&_GLOBAL_OFFSET_TABLE)[3]", we can clearly see (void *) 0x... <puts>,
+ 	*  signifying that this is the corresponding GOT entry for puts. What I can then do is manually change the address at that entry such
+ 	*  that the symbol address I previously obtained from dlsym is now shoved there before the actual runtime linker does it. */	
+	GOTtable[3] = symaddress;
+
+	/* If I run "$ make", then "$ gdb self-linker", and "break 39" and run, before even calling puts, if I "print GOTtable[3]", 
+ 	*  I should see the libc address of puts, meaning I successfully put it in the GOT manually */
 	puts("Hello world!");
+	puts("Hello again!");
 	dlclose(handle);
 	return 0;
 }
