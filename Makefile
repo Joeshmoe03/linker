@@ -1,4 +1,4 @@
-CFLAGS=-Wall -g -pedantic
+CFLAGS=-Wall -g -pedantic -fpie
 
 PROGS=self-linker
 
